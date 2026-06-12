@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice 1C</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: rgba(255, 255, 255, 0.84);
+      --panel-strong: #ffffff;
+      --text: #161b22;
+      --muted: #737b8c;
+      --line: rgba(26, 32, 44, 0.08);
+      --yellow: #ffd338;
+      --yellow-2: #ffbf00;
+      --yellow-soft: #fff5cc;
+      --amber: #ed9b00;
+      --green: #18b66a;
+      --green-soft: #e7f8ef;
+      --red: #ef4444;
+      --red-soft: #fff0f0;
+      --blue: #4172ff;
+      --blue-soft: #eef3ff;
+      --shadow: 0 24px 70px rgba(20, 25, 40, 0.11);
+      --shadow-small: 0 14px 40px rgba(20, 25, 40, 0.08);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --sidebar: #111827;
+      --sidebar-2: #1f2937;
+      --one-c: #ffd338;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 211, 56, .34), transparent 32%),
+        radial-gradient(circle at 90% 18%, rgba(65, 114, 255, .16), transparent 28%),
+        linear-gradient(145deg, #fffdf3 0%, #f6f7fb 42%, #f3f5f9 100%);
+      overflow: auto;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .app {
+      width: 100vw;
+      height: auto;
+      min-width: 1150px;
+      min-height: 100vh;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 280px minmax(760px, 1fr);
+      gap: 18px;
+    }
+
+    .splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: end start;
+      padding: 46px;
+      background:
+        linear-gradient(90deg, rgba(7, 10, 17, .28), rgba(7, 10, 17, .06)),
+        url("../resources/splash.png") center / cover no-repeat;
+      color: white;
+      transition: opacity .35s var(--ease), visibility .35s var(--ease);
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-panel {
+      max-width: 520px;
+      border-radius: 26px;
+      padding: 22px 24px;
+      background: rgba(8, 12, 20, .72);
+      border: 1px solid rgba(255, 211, 56, .35);
+      box-shadow: 0 30px 80px rgba(0,0,0,.35);
+      backdrop-filter: blur(14px);
+    }
+
+    .splash-panel strong {
+      display: block;
+      font-size: 30px;
+      letter-spacing: -.8px;
+      margin-bottom: 8px;
+    }
+
+    .splash-panel span {
+      color: rgba(255,255,255,.78);
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .sidebar {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(17, 24, 39, .97), rgba(31, 41, 55, .98)),
+        radial-gradient(circle at 20% 0%, rgba(255, 211, 56, .26), transparent 35%);
+      box-shadow: var(--shadow);
+      color: white;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 36px);
+    }
+
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      background: rgba(255, 211, 56, .16);
+      border-radius: 999px;
+      top: -120px;
+      left: -80px;
+      filter: blur(2px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 26px;
+    }
+
+    .brand-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, #ffe270, #ffc400);
+      box-shadow: 0 12px 30px rgba(255, 211, 56, .26);
+      display: grid;
+      place-items: center;
+      color: #151515;
+      font-weight: 900;
+      font-size: 21px;
+      letter-spacing: -1.2px;
+    }
+
+    .brand-title {
+      line-height: 1.08;
+    }
+
+    .brand-title strong {
+      display: block;
+      font-size: 22px;
+      letter-spacing: -.6px;
+    }
+
+    .brand-title span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav button {
+      height: 48px;
+      border-radius: 17px;
+      background: transparent;
+      color: rgba(255,255,255,.68);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      text-align: left;
+      transition: .24s var(--ease);
+    }
+
+    .nav button .ico {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: rgba(255,255,255,.07);
+      transition: .24s var(--ease);
+    }
+
+    .nav button:hover {
+      background: rgba(255,255,255,.07);
+      color: white;
+      transform: translateX(2px);
+    }
+
+    .nav button.active {
+      color: #171717;
+      background: var(--one-c);
+      box-shadow: 0 12px 26px rgba(255, 211, 56, .2);
+    }
+
+    .nav button.active .ico {
+      background: rgba(0,0,0,.11);
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-card {
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.055);
+      border-radius: 22px;
+      padding: 15px;
+      backdrop-filter: blur(14px);
+    }
+
+    .mini-card .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+      margin-bottom: 12px;
+    }
+
+    .mini-card .version {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 6px rgba(24,182,106,.15);
+    }
+
+    .main {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .topbar {
+      height: 86px;
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow-small);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 27px;
+      letter-spacing: -.9px;
+    }
+
+    .page-title p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .title-badge {
+      height: 44px;
+      width: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--yellow-soft);
+      color: #906300;
+      font-size: 20px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 11px 14px;
+      background: #f4f5f8;
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill.active {
+      background: var(--green-soft);
+      color: #077343;
+    }
+
+    .btn {
+      height: 44px;
+      border-radius: 15px;
+      padding: 0 16px;
+      background: #f0f2f6;
+      color: #222b38;
+      font-weight: 800;
+      transition: .22s var(--ease);
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(20,25,40,.08);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: .48;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn.primary {
+      background: var(--yellow);
+      color: #191919;
+      box-shadow: 0 12px 30px rgba(255, 211, 56, .28);
+    }
+
+    body.large-ui-mode .btn {
+      min-height: 48px;
+      font-size: 14px;
+    }
+
+    body.large-ui-mode .input,
+    body.large-ui-mode .select select {
+      min-height: 56px;
+      font-size: 15px;
+    }
+
+    .btn.dark {
+      background: #111827;
+      color: white;
+    }
+
+    .view {
+      display: none;
+      min-height: 0;
+      flex: 1;
+      animation: show .36s var(--ease);
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes show {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-grid {
+      height: auto;
+      align-items: start;
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.92);
+      box-shadow: var(--shadow-small);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .settings-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+      min-height: 0;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 2px;
+    }
+
+    .card-title h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -.35px;
+    }
+
+    .card-title span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      color: #5b6472;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f0f2f6;
+      border-radius: 18px;
+      padding: 5px;
+      gap: 5px;
+    }
+
+    .segmented button {
+      height: 43px;
+      border-radius: 14px;
+      background: transparent;
+      color: #657080;
+      font-weight: 850;
+      transition: .2s var(--ease);
+    }
+
+    .segmented button.active {
+      background: white;
+      color: #1f2937;
+      box-shadow: 0 9px 20px rgba(20,25,40,.08);
+    }
+
+    .select {
+      position: relative;
+    }
+
+    .select select {
+      width: 100%;
+      height: 52px;
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      border-radius: 18px;
+      padding: 0 46px 0 16px;
+      outline: none;
+      color: #1f2937;
+      font-weight: 750;
+      transition: .2s var(--ease);
+    }
+
+    .select::after {
+      content: "⌄";
+      position: absolute;
+      right: 17px;
+      top: 12px;
+      color: #8a94a6;
+      font-weight: 900;
+      pointer-events: none;
+    }
+
+    .select select:focus {
+      border-color: rgba(255, 196, 0, .7);
+      box-shadow: 0 0 0 5px rgba(255, 211, 56, .18);
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      border-radius: 20px;
+    }
+
+    .toggle-row strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .toggle-row span {
+      display: block;
+      margin-top: 3px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .switch {
+      position: relative;
+      width: 56px;
+      min-width: 56px;
+      height: 34px;
+      border-radius: 999px;
+      background: #d7dce5;
+      transition: .22s var(--ease);
+      cursor: pointer;
+    }
+
+    .switch::before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      top: 3px;
+      left: 3px;
+      background: white;
+      border-radius: 999px;
+      box-shadow: 0 5px 12px rgba(20,25,40,.18);
+      transition: .22s var(--ease);
+    }
+
+    .switch.on {
+      background: var(--green);
+    }
+
+    .switch.on::before {
+      transform: translateX(22px);
+    }
+
+    .switch.disabled {
+      cursor: not-allowed;
+      opacity: .48;
+      pointer-events: none;
+    }
+
+    .command-card {
+      margin-top: auto;
+      padding: 15px;
+      border-radius: 24px;
+      background:
+        linear-gradient(145deg, #fff8dc, #fffdf5);
+      border: 1px solid rgba(255, 211, 56, .35);
+    }
+
+    .command-card strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: white;
+      color: #6b5100;
+      border: 1px solid rgba(255, 211, 56, .42);
+    }
+
+    .control-area {
+      display: grid;
+      grid-template-rows: minmax(280px, 300px) auto;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .listen-card {
+      position: relative;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 245px;
+      gap: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 85% 12%, rgba(255, 211, 56, .42), transparent 34%),
+        rgba(255,255,255,.82);
+    }
+
+    .listen-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -90px -130px auto;
+      width: 250px;
+      height: 250px;
+      border-radius: 999px;
+      background: rgba(255, 211, 56, .18);
+    }
+
+    .status-main {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .status-badge {
+      width: max-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--yellow-soft);
+      color: #8a6200;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .status-badge.listening {
+      background: var(--green-soft);
+      color: #087b3a;
+    }
+
+    .status-badge.error {
+      background: var(--red-soft);
+      color: #b42318;
+    }
+
+    .status-badge .status-dot {
+      width: 10px;
+      height: 10px;
+      background: currentColor;
+      border-radius: 999px;
+      box-shadow: 0 0 0 5px rgba(24,182,106,.12);
+    }
+
+    .hero-text h2 {
+      margin: 18px 0 8px;
+      font-size: 38px;
+      letter-spacing: -1.6px;
+      line-height: .98;
+    }
+
+    .hero-text p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 520px;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      border-radius: 18px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(26,32,44,.06);
+      padding: 13px;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 19px;
+      letter-spacing: -.4px;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .mic-zone {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .mic-button {
+      width: 194px;
+      height: 194px;
+      border-radius: 54px;
+      background:
+        linear-gradient(145deg, #ffe16b, #ffc400);
+      color: #141414;
+      box-shadow:
+        0 25px 55px rgba(255, 196, 0, .35),
+        inset 0 1px 0 rgba(255,255,255,.7);
+      display: grid;
+      place-items: center;
+      transition: .25s var(--ease);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .mic-button:hover {
+      transform: translateY(-4px) scale(1.015);
+    }
+
+    .mic-button:active {
+      transform: translateY(0) scale(.98);
+    }
+
+    .mic-button .mic-icon {
+      font-size: 62px;
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,.13));
+    }
+
+    .mic-button.listening {
+      background:
+        linear-gradient(145deg, #27d989, #12a95f);
+      color: white;
+      box-shadow: 0 25px 55px rgba(24, 182, 106, .34);
+    }
+
+    .mic-button.listening::before,
+    .mic-button.listening::after {
+      content: "";
+      position: absolute;
+      inset: -15px;
+      border: 2px solid rgba(24, 182, 106, .33);
+      border-radius: 68px;
+      animation: pulse 1.55s var(--ease) infinite;
+      z-index: -1;
+    }
+
+    .mic-button.listening::after {
+      animation-delay: .45s;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(.9); opacity: .85; }
+      100% { transform: scale(1.25); opacity: 0; }
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .result-card, .history-card {
+      padding: 22px;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .result-box {
+      flex: 1;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      padding: 17px;
+      font-size: 15px;
+      line-height: 1.55;
+      overflow: visible;
+      color: #243041;
+      white-space: pre-wrap;
+      min-height: 160px;
+    }
+
+    .result-box code {
+      display: block;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      background: #111827;
+      color: #f7f7f7;
+      padding: 15px;
+      border-radius: 16px;
+      line-height: 1.5;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 10px;
+      overflow: visible;
+      padding-right: 3px;
+    }
+
+    .history-item {
+      padding: 13px;
+      border-radius: 18px;
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+      animation: itemIn .28s var(--ease);
+    }
+
+    @keyframes itemIn {
+      from { opacity: 0; transform: translateX(8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .history-item strong {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: #667085;
+      margin-bottom: 5px;
+    }
+
+    .history-item p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .recognition-layout,
+    .updates-layout,
+    .settings-layout,
+    .dictionary-layout {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .wide-card {
+      padding: 24px;
+      overflow: auto;
+    }
+
+    .engine-card {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .engine-option {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #fbfcfe;
+      transition: .22s var(--ease);
+      cursor: pointer;
+    }
+
+    .engine-option:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(20,25,40,.07);
+    }
+
+    .engine-option.active {
+      border-color: rgba(255, 196, 0, .75);
+      background: #fff9df;
+      box-shadow: 0 0 0 5px rgba(255, 211, 56, .13);
+    }
+
+    .engine-option h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .engine-option p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    .engine-status {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #fbfcfe;
+      display: grid;
+      gap: 12px;
+    }
+
+    .engine-status .state-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .engine-status .state-line strong {
+      color: #1f2937;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .chrome-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .meter {
+      height: 16px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #edf0f5;
+      position: relative;
+    }
+
+    .meter span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--yellow), var(--green));
+      transition: width .4s var(--ease);
+    }
+
+    .kv-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .kv {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .kv span {
+      color: var(--muted);
+    }
+
+    .kv strong {
+      text-align: right;
+    }
+
+    .update-hero {
+      min-height: 220px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(255, 211, 56, .48), transparent 34%),
+        linear-gradient(145deg, #111827, #263244);
+      color: white;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .update-hero h2 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: -1px;
+    }
+
+    .update-hero p {
+      margin: 9px 0 0;
+      color: rgba(255,255,255,.7);
+      max-width: 460px;
+      line-height: 1.5;
+    }
+
+    .release-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .release-item {
+      padding: 16px;
+      border-radius: 20px;
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+    }
+
+    .release-item strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .release-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .field-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .btn.small {
+      height: 38px;
+      border-radius: 13px;
+      padding: 0 10px;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: -4px;
+    }
+
+    .input {
+      height: 52px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      padding: 0 15px;
+      outline: none;
+      color: #1f2937;
+      font-weight: 700;
+      transition: .2s var(--ease);
+      width: 100%;
+    }
+
+    .input:focus {
+      border-color: rgba(255, 196, 0, .72);
+      box-shadow: 0 0 0 5px rgba(255, 211, 56, .16);
+    }
+
+    .dictionary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 17px;
+      overflow: hidden;
+      border-radius: 18px;
+    }
+
+    .dictionary-table th,
+    .dictionary-table td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .dictionary-table th {
+      color: #667085;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      background: #f3f5f9;
+    }
+
+    .log-box {
+      height: 290px;
+      overflow: auto;
+      border-radius: 22px;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 16px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      margin-top: 18px;
+    }
+
+    .modal-layer {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(17,24,39,.42);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+      animation: fade .2s var(--ease);
+    }
+
+    .modal-layer.show {
+      display: grid;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      width: min(520px, calc(100vw - 32px));
+      border-radius: 32px;
+      background: white;
+      box-shadow: 0 40px 100px rgba(0,0,0,.26);
+      padding: 26px;
+      animation: modalIn .28s var(--ease);
+    }
+
+    @keyframes modalIn {
+      from { transform: translateY(16px) scale(.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal h2 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: -.7px;
+    }
+
+    .modal p {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 26px;
+      bottom: 26px;
+      background: #111827;
+      color: white;
+      border-radius: 20px;
+      padding: 15px 17px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.2);
+      transform: translateY(30px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .28s var(--ease);
+      z-index: 30;
+      max-width: 360px;
+      line-height: 1.35;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .sparkline {
+      width: 100%;
+      height: 60px;
+      display: flex;
+      align-items: end;
+      gap: 5px;
+      margin-top: 12px;
+    }
+
+    .sparkline i {
+      flex: 1;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--yellow), var(--amber));
+      min-height: 8px;
+      height: var(--h, 8px);
+      transition: height .18s var(--ease), opacity .18s var(--ease);
+      opacity: .9;
+    }
+
+    @media (max-width: 1150px) {
+      .app {
+        grid-template-columns: 96px minmax(700px, 1fr);
+      }
+
+      .brand-title,
+      .nav button span:not(.ico),
+      .mini-card {
+        display: none;
+      }
+
+      .sidebar {
+        padding: 20px 14px;
+        align-items: center;
+      }
+
+      .brand {
+        justify-content: center;
+      }
+
+      .nav button {
+        width: 58px;
+        justify-content: center;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-panel">
+      <strong>Voice 1C</strong>
+      <span>Подготовка Chrome Speech, Vosk fallback и Python pipeline...</span>
+    </div>
+  </div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">1C</div>
+        <div class="brand-title">
+          <strong>Voice 1C</strong>
+          <span>Голосовой ввод кода</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="active" data-view="dashboard"><span class="ico">🎙</span><span>Диктовка</span></button>
+        <button data-view="recognition"><span class="ico">⚡</span><span>Распознавание</span></button>
+        <button data-view="dictionary"><span class="ico">{} </span><span>Словарь 1С</span></button>
+        <button data-view="updates"><span class="ico">⬇</span><span>Обновления</span></button>
+        <button data-view="settings"><span class="ico">⚙</span><span>Настройки</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="mini-card">
+          <div class="line">
+            <span>Текущая версия</span>
+            <span id="sidebarVersion">v1.0.0</span>
+          </div>
+          <div class="version"><i class="dot"></i> Система готова</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="page-title">
+          <div class="title-badge" id="pageIcon">🎙</div>
+          <div>
+            <h1 id="pageTitle">Диктовка</h1>
+            <p id="pageSubtitle">Быстрый голосовой ввод для 1С с офлайн fallback</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <div class="pill active" id="connectionPill"><span class="dot"></span> UI ready</div>
+          <button class="btn" id="openUpdateModal">⬇ Обновить</button>
+          <button class="btn primary" id="quickSettings">⚙ Быстрые настройки</button>
+        </div>
+      </header>
+
+      <section class="view active" id="dashboard">
+        <div class="dashboard-grid">
+          <div class="card settings-card">
+            <div class="card-title">
+              <h2>Профиль работы</h2>
+              <span>Voice profile</span>
+            </div>
+
+            <div class="field">
+              <label>Режим</label>
+              <div class="segmented" data-segment="mode">
+                <button class="active" data-value="1c">1С-код</button>
+                <button data-value="text">Обычный текст</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Движок распознавания</label>
+              <div class="select">
+                <select id="engineSelect">
+                  <option value="auto">Auto — Chrome, затем Vosk</option>
+                  <option value="chrome speech free">Chrome Speech Free</option>
+                  <option value="vosk offline">Vosk Offline</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Метод ввода</label>
+              <div class="select">
+                <select id="inputMethod">
+                  <option value="clipboard">Быстрый через буфер обмена</option>
+                  <option value="keyboard">Совместимый keyboard.write</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Микрофон</label>
+              <div class="select">
+                <select id="microphoneSelect">
+                  <option value="">Загрузка устройств...</option>
+                </select>
+              </div>
+              <div class="field-actions">
+                <button class="btn small" id="refreshMicrophones">Обновить</button>
+                <button class="btn small" id="testMicrophone">Тест микрофона</button>
+                <button class="btn small primary" id="testInsert">Тест вставки</button>
+              </div>
+              <div class="hint">Поставьте курсор в редактор 1С или Блокнот, затем говорите или нажмите тест вставки.</div>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Подтверждать опасные команды</strong>
+                <span>Удаление, вырезание, вставка</span>
+              </div>
+              <div class="switch on" data-toggle data-setting="confirm_dangerous_commands"></div>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Звуковой сигнал</strong>
+                <span>Старт/стоп диктовки</span>
+              </div>
+              <div class="switch on" data-toggle data-setting="sound_enabled"></div>
+            </div>
+
+            <div class="command-card">
+              <strong>Голосовые команды</strong>
+              <div class="chips">
+                <span class="chip">старт</span>
+                <span class="chip">стоп</span>
+                <span class="chip">интер</span>
+                <span class="chip">таб</span>
+                <span class="chip">отмена</span>
+                <span class="chip">перенос</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-area">
+            <div class="card listen-card">
+              <div class="status-main">
+                <div>
+                  <div class="status-badge" id="statusBadge"><span class="status-dot"></span><span>Пауза</span></div>
+                  <div class="hero-text">
+                    <h2 id="heroTitle">Готов к диктовке</h2>
+                    <p id="heroText">Нажмите большую кнопку или скажите “старт”. Интерфейс специально сделан крупным, контрастным и без лишних кликов.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="quick-stats">
+                    <div class="stat"><b id="latencyStat">—</b><span>вставка</span></div>
+                    <div class="stat"><b id="accuracyStat">Auto</b><span>движок</span></div>
+                    <div class="stat"><b id="phrasesStat">0</b><span>фраз сегодня</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mic-zone">
+                <button class="mic-button" id="micButton" title="Начать / остановить диктовку">
+                  <span class="mic-icon">🎙</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="history-grid">
+              <div class="card result-card">
+                <div class="card-title">
+                  <h2>Последний результат</h2>
+                  <span id="resultMode">1С-код</span>
+                </div>
+                <div class="result-box" id="resultBox">
+                  Здесь появится последняя распознанная фраза и результат форматирования.
+                </div>
+              </div>
+
+              <div class="card history-card">
+                <div class="card-title">
+                  <h2>История</h2>
+                  <span>последние 5</span>
+                </div>
+                <div class="history-list" id="historyList">
+                  <div class="history-item">
+                    <strong><span>Система</span><span>сейчас</span></strong>
+                    <p>Ожидание диктовки...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="recognition">
+        <div class="recognition-layout">
+          <div class="card wide-card">
+            <div class="card-title">
+              <h2>Движки распознавания</h2>
+              <span>priority</span>
+            </div>
+            <div class="engine-card">
+              <div class="engine-option active" data-engine="auto">
+                <h3>Auto</h3>
+                <p>Пробует Chrome Speech Free. Если Chrome или Web Speech недоступны — включает Vosk Offline.</p>
+              </div>
+              <div class="engine-option" data-engine="chrome speech free">
+                <h3>Chrome Speech Free</h3>
+                <p>Бесплатное онлайн-распознавание через Chrome Web Speech API и локальный Python bridge.</p>
+              </div>
+              <div class="engine-option" data-engine="vosk offline">
+                <h3>Vosk Offline</h3>
+                <p>Офлайн-режим без интернета. Надёжный fallback, но точность ниже.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card wide-card">
+            <div class="card-title">
+              <h2>Качество и задержка</h2>
+              <span>live preview</span>
+            </div>
+            <div class="kv-grid">
+              <div class="kv"><span>Выбранный движок</span><strong id="engineInfo">Auto</strong></div>
+              <div class="kv"><span>Фактически активен</span><strong id="activeEngineInfo">—</strong></div>
+              <div class="kv"><span>Partial results</span><strong>включены</strong></div>
+              <div class="kv"><span>Метод вставки</span><strong id="inputMethodInfo">clipboard paste</strong></div>
+              <div class="kv"><span>Fallback</span><strong>Vosk Offline</strong></div>
+            </div>
+            <div style="margin-top: 24px;">
+              <div class="card-title"><h2>Активность микрофона</h2><span id="meterLabel">0%</span></div>
+              <div class="meter"><span id="audioMeter"></span></div>
+              <div class="sparkline">
+                <i style="--h: 8px"></i><i style="--h: 8px"></i><i style="--h: 8px"></i><i style="--h: 8px"></i>
+                <i style="--h: 8px"></i><i style="--h: 8px"></i><i style="--h: 8px"></i><i style="--h: 8px"></i>
+                <i style="--h: 8px"></i><i style="--h: 8px"></i><i style="--h: 8px"></i><i style="--h: 8px"></i>
+              </div>
+            </div>
+            <div class="engine-status">
+              <div class="card-title">
+                <h2>Chrome Speech Free</h2>
+                <span id="chromeState">idle</span>
+              </div>
+              <div class="state-line"><span>Chrome</span><strong id="chromeFound">—</strong></div>
+              <div class="state-line"><span>Версия</span><strong id="chromeVersion">—</strong></div>
+              <div class="state-line"><span>Web Speech API</span><strong id="chromeSpeechApi">—</strong></div>
+              <div class="state-line"><span>Bridge</span><strong id="chromeBridgeUrl">—</strong></div>
+              <div class="field">
+                <label>Режим окна Chrome</label>
+                <div class="select">
+                  <select id="chromeModeSelect">
+                    <option value="headless">Headless — без окна Chrome</option>
+                    <option value="hidden">Hidden — окно спрятано</option>
+                    <option value="visible">Visible — показать окно</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chrome-actions">
+                <button class="btn small primary" id="testChromeSpeech">Проверить Chrome</button>
+                <button class="btn small" id="restartChromeSpeech">Перезапустить</button>
+                <button class="btn small" id="openChromeWindow">Открыть окно</button>
+                <button class="btn small" id="resetChromePermission">Сбросить доступ</button>
+                <button class="btn small" id="openChromeDownload">Установить Chrome</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="dictionary">
+        <div class="dictionary-layout">
+          <div class="card wide-card">
+            <div class="card-title">
+              <h2>Словарь замен</h2>
+              <span>replacements.json</span>
+            </div>
+            <table class="dictionary-table">
+              <thead>
+                <tr><th>Фраза</th><th>Результат</th><th>Тип</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>точка с запятой</td><td>;</td><td>символ</td></tr>
+                <tr><td>равно</td><td>=</td><td>оператор</td></tr>
+                <tr><td>скобки</td><td>()</td><td>шаблон</td></tr>
+                <tr><td>кавычки</td><td>""</td><td>шаблон</td></tr>
+                <tr><td>конец если</td><td>КонецЕсли;</td><td>1С</td></tr>
+                <tr><td>неопределено</td><td>Неопределено</td><td>1С</td></tr>
+              </tbody>
+            </table>
+            <div style="display:flex; gap:10px; margin-top:18px;">
+              <button class="btn primary" id="addRule" disabled title="Редактор словаря будет подключён отдельным безопасным патчем">+ Добавить правило</button>
+              <button class="btn" id="importRules" disabled title="Импорт словаря пока отключён">Импорт</button>
+              <button class="btn" id="exportRules" disabled title="Экспорт словаря пока отключён">Экспорт</button>
+            </div>
+          </div>
+
+          <div class="card wide-card">
+            <div class="card-title">
+              <h2>Тест форматирования</h2>
+              <span>preview</span>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <label>Голосовая фраза</label>
+                <input class="input" id="phraseInput" value="если сумма равно ноль тогда" />
+              </label>
+              <button class="btn dark" id="formatTest">Проверить форматирование</button>
+              <div class="result-box" id="formatPreview">Если Сумма = 0 Тогда</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="updates">
+        <div class="updates-layout">
+          <div class="card wide-card">
+            <div class="update-hero">
+              <div>
+                <h2>Автообновления</h2>
+                <p>Проверка публичного GitHub Releases, сравнение версии и запуск setup.exe только после согласия пользователя.</p>
+              </div>
+              <div>
+                <button class="btn primary" id="checkUpdates">Проверить сейчас</button>
+              </div>
+            </div>
+            <div class="release-list">
+              <div class="release-item">
+                <strong>Состояние проверяется через GitHub Releases</strong>
+                <p>Если релизов ещё нет, приложение покажет “Релизы пока не опубликованы” без ошибки.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card wide-card">
+            <div class="card-title">
+              <h2>Настройки GitHub</h2>
+              <span>public repo</span>
+            </div>
+            <div class="form-grid">
+              <input class="input" id="githubOwner" value="xerlovemate" />
+              <input class="input" id="githubRepo" value="Voice_1C" />
+              <input class="input" id="releaseAssetName" value="Voice1CSetup.exe" />
+              <div class="toggle-row">
+                <div><strong>Проверять при запуске</strong><span>без автоустановки</span></div>
+                <div class="switch on" data-toggle data-setting="update_check_on_start"></div>
+              </div>
+            </div>
+            <div class="log-box" id="updateLog">[ready] GitHub updater ожидает настройки репозитория
+[info] Использовать Releases API, не HTML parser
+[info] Asset: Voice1CSetup.exe
+ [info] Current version: 1.0.0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="settings">
+        <div class="settings-layout">
+          <div class="card wide-card">
+            <div class="card-title">
+              <h2>Общие настройки</h2>
+              <span>app config</span>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label>Название приложения</label><input class="input" value="Voice 1C"></div>
+              <div class="field"><label>Версия</label><input class="input" id="appVersion" value="1.0.0"></div>
+              <div class="field"><label>Папка логов</label><input class="input" value="%LOCALAPPDATA%\\Voice1C\\logs"></div>
+              <div class="toggle-row">
+                <div><strong>Запускать вместе с Windows</strong><span>опционально для отца</span></div>
+                <div class="switch disabled" title="Автозапуск будет добавлен отдельным патчем"></div>
+              </div>
+              <div class="toggle-row">
+                <div><strong>Большой режим интерфейса</strong><span>крупнее кнопки и текст</span></div>
+                <div class="switch on" data-toggle data-setting="large_ui_mode"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card wide-card">
+            <div class="card-title">
+              <h2>Лог приложения</h2>
+              <span>last events</span>
+            </div>
+            <div class="log-box" id="appLog">[waiting] Реальный лог появится после подключения backend.</div>
+            <div style="display:flex; gap:10px; margin-top:16px;">
+              <button class="btn" id="openLogs">Открыть лог</button>
+              <button class="btn" id="copyLog">Копировать лог</button>
+              <button class="btn" id="clearLog">Очистить</button>
+              <button class="btn primary" id="saveSettings">Сохранить</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-layer" id="modalLayer">
+    <div class="modal">
+      <h2 id="modalTitle">Доступна новая версия</h2>
+      <p id="modalText">Найдена версия 1.5.0. В ней улучшено распознавание и добавлен новый установщик setup.exe. Установить обновление?</p>
+      <div class="modal-actions">
+        <button class="btn" id="modalCancel">Позже</button>
+        <button class="btn primary" id="modalOk">Обновить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Готово</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

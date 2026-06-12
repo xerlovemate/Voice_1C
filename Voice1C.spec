@@ -1,16 +1,48 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from pathlib import Path
+import vosk
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+
+ROOT = Path.cwd()
+VOSK_DIR = Path(vosk.__file__).resolve().parent
+SELENIUM_DATAS = collect_data_files("selenium", include_py_files=False)
+SELENIUM_HIDDENIMPORTS = collect_submodules("selenium")
+
+datas = [
+    (str(ROOT / "frontend"), "frontend"),
+    (str(ROOT / "resources"), "resources"),
+    (str(ROOT / "voice_actions" / "command_config.json"), "voice_actions"),
+    (str(VOSK_DIR), "vosk"),
+] + SELENIUM_DATAS
 
 a = Analysis(
-    ['main.py'],
-    pathex=[],
+    ["main.py"],
+    pathex=[str(ROOT)],
     binaries=[],
-    datas=[],
-    hiddenimports=[],
+    datas=datas,
+    hiddenimports=[
+        "webview",
+        "webview.platforms.winforms",
+        "pythonnet",
+        "clr_loader",
+        "pynput.keyboard._win32",
+        "pynput.mouse._win32",
+        "keyboard",
+        "pyperclip",
+        "vosk",
+        "pyaudio",
+        "selenium",
+        "trio",
+        "trio_websocket",
+        "websocket",
+        "wsproto",
+        *SELENIUM_HIDDENIMPORTS,
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=["PyQt5", "PySide6"],
     noarchive=False,
     optimize=0,
 )
@@ -21,7 +53,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Voice1C',
+    name="Voice1C",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -32,8 +64,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    uac_admin=True,
-    icon=['icon.ico'],
+    icon=str(ROOT / "resources" / "icon.ico"),
 )
 coll = COLLECT(
     exe,
@@ -42,5 +73,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Voice1C',
+    name="Voice1C",
 )

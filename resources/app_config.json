@@ -1,0 +1,19 @@
+{
+  "app_name": "Voice 1C",
+  "version": "1.1.0",
+  "github_owner": "xerlovemate",
+  "github_repo": "Voice_1C",
+  "release_asset_name": "Voice1CSetup.exe",
+  "update_check_on_start": true,
+  "speech_engine": "auto",
+  "chrome_mode": "headless",
+  "chrome_bridge_port": 0,
+  "input_method": "clipboard",
+  "selected_microphone_id": null,
+  "insert_delay_ms": 300,
+  "restore_clipboard": true,
+  "restore_clipboard_delay_ms": 250,
+  "confirm_dangerous_commands": true,
+  "sound_enabled": true,
+  "large_ui_mode": true
+}

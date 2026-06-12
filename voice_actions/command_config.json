@@ -1,0 +1,17 @@
+{
+  "threshold": 86,
+  "commands": [
+    {"action": "start", "phrases": ["старт", "начать", "слушай"], "dangerous": false},
+    {"action": "stop", "phrases": ["стоп", "сто", "остановить", "пауза"], "dangerous": false},
+    {"action": "enter", "phrases": ["enter", "интер", "энтер", "эндер"], "dangerous": false},
+    {"action": "tab", "phrases": ["tab", "таб", "тап", "так", "пап"], "dangerous": false},
+    {"action": "delete_word", "phrases": ["удали слово", "удали", "доли"], "dangerous": true},
+    {"action": "delete_line", "phrases": ["удали строку", "удалить строку"], "dangerous": true},
+    {"action": "copy", "phrases": ["копировать", "копье", "копия", "как ее", "как её"], "dangerous": false},
+    {"action": "paste", "phrases": ["вставить", "паста", "пастор"], "dangerous": true},
+    {"action": "cut", "phrases": ["вырезать", "вязать"], "dangerous": true},
+    {"action": "search", "phrases": ["поиск", "найти"], "dangerous": false},
+    {"action": "newline", "phrases": ["перенос", "новая строка", "конец строки"], "dangerous": false},
+    {"action": "undo", "phrases": ["отмена", "отмени", "назад"], "dangerous": false}
+  ]
+}
