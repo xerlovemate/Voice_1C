@@ -1,0 +1,150 @@
+[
+    {
+        "patterns": "восклицательный знак",
+        "replacement": "!"
+    },
+    {
+        "patterns": "собака",
+        "replacement": "@"
+    },
+    {
+        "patterns": "двойная кавычках, двойные кавычки",
+        "replacement": "\"\""
+    },
+    {
+        "patterns": "кавычках, кавычки",
+        "replacement": "''"
+    },
+    {
+        "patterns": "решётка",
+        "replacement": "#"
+    },
+    {
+        "patterns": "доллар",
+        "replacement": "$"
+    },
+    {
+        "patterns": "точка с запятой",
+        "replacement": ";"
+    },
+    {
+        "patterns": "процент",
+        "replacement": "%"
+    },
+    {
+        "patterns": "двоеточие",
+        "replacement": ":"
+    },
+    {
+        "patterns": "ампер сант, ампер санд, ампер санкт, амбер санд, амбер саунд, амбер санкт, ампир санд, амбер сант, андерсон",
+        "replacement": "&"
+    },
+    {
+        "patterns": "вопросительный знак, знак вопроса",
+        "replacement": "?"
+    },
+    {
+        "patterns": "звёздочка",
+        "replacement": "*"
+    },
+    {
+        "patterns": "квадратные скобки, квадратная скобка",
+        "replacement": "[]"
+    },
+    {
+        "patterns": "фигурные скобки, фигурная скобка",
+        "replacement": "{}"
+    },
+    {
+        "patterns": "скобки, скобка",
+        "replacement": "()"
+    },
+    {
+        "patterns": "тире",
+        "replacement": "-"
+    },
+    {
+        "patterns": "минус",
+        "replacement": "-"
+    },
+    {
+        "patterns": "плюс",
+        "replacement": "+"
+    },
+    {
+        "patterns": "равно",
+        "replacement": "="
+    },
+    {
+        "patterns": "слэш",
+        "replacement": "/"
+    },
+    {
+        "patterns": "один",
+        "replacement": "1"
+    },
+    {
+        "patterns": "два",
+        "replacement": "2"
+    },
+    {
+        "patterns": "три",
+        "replacement": "3"
+    },
+    {
+        "patterns": "четыре",
+        "replacement": "4"
+    },
+    {
+        "patterns": "пять",
+        "replacement": "5"
+    },
+    {
+        "patterns": "шесть",
+        "replacement": "6"
+    },
+    {
+        "patterns": "восемь",
+        "replacement": "8"
+    },
+    {
+        "patterns": "семь",
+        "replacement": "7"
+    },
+    {
+        "patterns": "девять",
+        "replacement": "9"
+    },
+    {
+        "patterns": "ноль",
+        "replacement": "0"
+    },
+    {
+        "patterns": "запятая",
+        "replacement": ","
+    },
+    {
+        "patterns": "нижнее подчёркивание",
+        "replacement": "_"
+    },
+    {
+        "patterns": "больше",
+        "replacement": ">"
+    },
+    {
+        "patterns": "меньше",
+        "replacement": "<"
+    },
+    {
+        "patterns": "ё",
+        "replacement": "е"
+    },
+    {
+        "patterns": "дрочка, дочка",
+        "replacement": "."
+    },
+    {
+        "patterns": "конец строки",
+        "replacement": ";"
+    }
+]

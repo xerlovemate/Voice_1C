@@ -1,0 +1,15 @@
+.venv/
+build/
+dist/
+dist_installer/
+__pycache__/
+.idea/
+*.pyc
+*.log
+*.tmp
+.env
+
+modelcpp/
+11.03.26/
+
+gh

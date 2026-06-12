@@ -1,0 +1,99 @@
+/* Подключение шрифта Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+/* Основные стили для главного окна */
+QMainWindow {
+    background-color: #FFFFFF;
+    border: 1px solid #B0B0B0;
+    font-family: 'Lato', sans-serif;
+}
+
+QLabel {
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+QLabel#title {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+QPushButton {
+    background-color: #F7B72C;
+    border: 2px solid #F7A000;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    color: #FFFFFF;
+    width: 220px;
+    text-align: center;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+QPushButton:hover {
+    background-color: #F7A000;
+}
+
+QPushButton:pressed {
+    background-color: #F79F00;
+}
+
+QVBoxLayout, QHBoxLayout {
+    align-items: center;
+    justify-content: center;
+}
+
+QCheckBox {
+    font-size: 16px;
+    color: #333;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+QCheckBox::indicator {
+    width: 24px;
+    height: 24px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #F7B72C;
+    border: 2px solid #F7A000;
+    border-radius: 12px;
+}
+
+QCheckBox::indicator:unchecked {
+    background-color: #FFFFFF;
+    border: 2px solid #F7A000;
+    border-radius: 12px;
+}
+
+QPushButton {
+    margin: 5px;
+}
+
+QPushButton[text="Стоп"] {
+    background-color: #FF4D4D;
+}
+
+QPushButton[text="Стоп"]:hover {
+    background-color: #FF3333;
+}
+
+QPushButton[text="Стоп"]:pressed {
+    background-color: #FF1A1A;
+}
+
+/* Стили для кнопок в диалоге настроек */
+SettingsDialog QPushButton {
+    min-width: 80px;
+    max-width: 120px;
+    width: auto;  /* Отменяем фиксированную ширину из общего стиля */
+    margin: 5px;
+}
