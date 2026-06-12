@@ -1,5 +1,5 @@
 #define MyAppName "Voice 1C"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.1.1"
 #define MyAppPublisher "xerlovemate"
 #define MyAppExeName "Voice1C.exe"
 

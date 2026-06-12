@@ -13,6 +13,18 @@ let backendReady = false;
 let pendingUpdate = false;
 let levelHistory = new Array(12).fill(0);
 let lastListeningState = null;
+let splashStartedAt = Date.now();
+let splashTimer = null;
+
+const splashStages = [
+  { at: 0, phase: "1 / 5", status: "Запуск интерфейса", hint: "Загружаем окно Voice 1C и ресурсы интерфейса." },
+  { at: 3, phase: "2 / 5", status: "Чтение настроек", hint: "Поднимаем backend, читаем config и готовим логи." },
+  { at: 6, phase: "3 / 5", status: "Проверка Chrome Speech", hint: "Ищем Chrome, готовим headless-профиль и Selenium bridge." },
+  { at: 12, phase: "4 / 5", status: "Подготовка микрофонов", hint: "Проверяем устройства ввода и Vosk fallback." },
+  { at: 18, phase: "5 / 5", status: "Финальная проверка", hint: "Синхронизируем состояние UI. Обычно осталось совсем немного." },
+  { at: 30, phase: "дольше обычного", status: "Chrome/Selenium ещё готовятся", hint: "Первый запуск может занять до минуты, особенно после обновления." },
+  { at: 60, phase: "проверьте лог", status: "Загрузка идёт слишком долго", hint: "Если экран не сменится, перезапустите приложение. Лог: %LOCALAPPDATA%\\Voice1C\\logs\\app.log" },
+];
 
 function api() {
   return window.pywebview && window.pywebview.api ? window.pywebview.api : null;
@@ -35,7 +47,51 @@ function showToast(text) {
 }
 
 function hideSplash() {
-  $("#splashScreen")?.classList.add("hidden");
+  if (splashTimer) {
+    clearInterval(splashTimer);
+    splashTimer = null;
+  }
+  const bar = $("#splashProgressBar");
+  if (bar) bar.style.width = "100%";
+  $("#splashStatus") && ($("#splashStatus").textContent = "Готово");
+  $("#splashRemaining") && ($("#splashRemaining").textContent = "запуск завершён");
+  setTimeout(() => $("#splashScreen")?.classList.add("hidden"), 180);
+}
+
+function updateSplash() {
+  const elapsed = Math.max(0, Math.floor((Date.now() - splashStartedAt) / 1000));
+  const stage = splashStages.reduce((current, item) => (elapsed >= item.at ? item : current), splashStages[0]);
+  const targetPercent = elapsed < 20 ? 8 + elapsed * 4 : Math.min(94, 88 + ((elapsed - 20) % 7));
+
+  const status = $("#splashStatus");
+  const elapsedEl = $("#splashElapsed");
+  const remaining = $("#splashRemaining");
+  const phase = $("#splashPhase");
+  const hint = $("#splashHint");
+  const bar = $("#splashProgressBar");
+
+  if (status) status.textContent = stage.status;
+  if (elapsedEl) elapsedEl.textContent = `${elapsed} сек`;
+  if (phase) phase.textContent = stage.phase;
+  if (hint) hint.textContent = stage.hint;
+  if (bar) bar.style.width = `${Math.min(96, Math.max(8, targetPercent))}%`;
+
+  if (remaining) {
+    if (elapsed < 20) {
+      remaining.textContent = `примерно до ${20 - elapsed} сек`;
+    } else if (elapsed < 60) {
+      remaining.textContent = "дольше обычного";
+    } else {
+      remaining.textContent = "нужна проверка";
+    }
+  }
+}
+
+function startSplashAnimation() {
+  splashStartedAt = Date.now();
+  updateSplash();
+  if (splashTimer) clearInterval(splashTimer);
+  splashTimer = setInterval(updateSplash, 500);
 }
 
 function playTone(active) {
@@ -513,6 +569,7 @@ document.addEventListener("pywebviewready", async () => {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
+  startSplashAnimation();
   bindUi();
   setListeningVisual({ listening: false, status_kind: "paused" });
   updateMicLevel(0);

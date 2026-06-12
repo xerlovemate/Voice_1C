@@ -99,6 +99,8 @@
       border: 1px solid rgba(255, 211, 56, .35);
       box-shadow: 0 30px 80px rgba(0,0,0,.35);
       backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
     }
 
     .splash-panel strong {
@@ -112,6 +114,111 @@
       color: rgba(255,255,255,.78);
       line-height: 1.45;
       font-weight: 700;
+    }
+
+    .splash-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,.12) 45%, transparent 68%);
+      transform: translateX(-100%);
+      animation: splashSweep 2.2s var(--ease) infinite;
+      pointer-events: none;
+    }
+
+    .splash-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    .splash-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      color: rgba(255,255,255,.9);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .splash-spinner {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,.22);
+      border-top-color: var(--yellow);
+      animation: splashSpin .85s linear infinite;
+      flex: 0 0 auto;
+    }
+
+    .splash-progress {
+      position: relative;
+      z-index: 1;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.18);
+      margin-top: 16px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
+    }
+
+    .splash-progress span {
+      display: block;
+      width: 8%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ffd338, #ff7a1a, #ff2a2a);
+      transition: width .45s var(--ease);
+      position: relative;
+    }
+
+    .splash-progress span::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+      animation: splashBar 1.2s linear infinite;
+    }
+
+    .splash-meta {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 18px;
+      margin-top: 13px;
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .splash-meta b {
+      color: white;
+      font-weight: 900;
+    }
+
+    .splash-hint {
+      position: relative;
+      z-index: 1;
+      margin-top: 12px;
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    @keyframes splashSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes splashSweep {
+      0% { transform: translateX(-100%); opacity: 0; }
+      35% { opacity: 1; }
+      100% { transform: translateX(100%); opacity: 0; }
+    }
+
+    @keyframes splashBar {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(100%); }
     }
 
     .sidebar {
@@ -1253,8 +1360,24 @@
 <body>
   <div class="splash-screen" id="splashScreen">
     <div class="splash-panel">
-      <strong>Voice 1C</strong>
-      <span>Подготовка Chrome Speech, Vosk fallback и Python pipeline...</span>
+      <div class="splash-copy">
+        <strong>Voice 1C</strong>
+        <span>Подготовка голосового ввода для 1С...</span>
+      </div>
+      <div class="splash-status">
+        <i class="splash-spinner"></i>
+        <b id="splashStatus">Запуск интерфейса</b>
+      </div>
+      <div class="splash-progress"><span id="splashProgressBar"></span></div>
+      <div class="splash-meta">
+        <span>Прошло: <b id="splashElapsed">0 сек</b></span>
+        <span id="splashRemaining">обычно 5-20 сек</span>
+        <span>Этап: <b id="splashPhase">1 / 5</b></span>
+        <span>режим Chrome: headless</span>
+      </div>
+      <div class="splash-hint" id="splashHint">
+        Первый запуск может быть дольше: Chrome и Selenium готовят профиль и проверяют микрофон.
+      </div>
     </div>
   </div>
 
