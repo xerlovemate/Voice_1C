@@ -49,6 +49,7 @@ class AppController:
         self.update_message = "Готово к проверке обновлений."
         self.pending_update: UpdateInfo | None = None
         self.recent_phrases: list[dict] = []
+        self._toggle_debounce_until = 0.0
         self.replacements = self._load_replacements()
         self.chrome_manager = ChromeManager()
         self.inserter = TextInserter(
@@ -206,6 +207,9 @@ class AppController:
     def toggle_listening(self) -> dict:
         with self.lock:
             self.logger.info("[API] toggle_listening received")
+            if time.monotonic() < self._toggle_debounce_until:
+                self.logger.info("[API] toggle_listening ignored: debounce")
+                return self.get_status()
             if self.listening or self.status_kind == "error":
                 if self.engine:
                     self.engine.stop()
@@ -216,23 +220,35 @@ class AppController:
                 self.partial_text = ""
                 self.mic_level = 0.0
                 self.logger.info("listening changed: %s", self.listening)
-                return self.get_status()
+                status = self.get_status()
+                self._toggle_debounce_until = time.monotonic() + 1.2
+                return status
             if not self.listening and not self.ensure_engine_started():
-                return self.get_status()
+                status = self.get_status()
+                self._toggle_debounce_until = time.monotonic() + 1.2
+                return status
             self.listening = True
             self.status = "Слушаю" if self.listening else "Пауза"
             self.status_kind = "listening" if self.listening else "paused"
             self.logger.info("listening changed: %s", self.listening)
-            return self.get_status()
+            status = self.get_status()
+            self._toggle_debounce_until = time.monotonic() + 1.2
+            return status
 
     def set_listening(self, value: bool) -> None:
         with self.lock:
             if value:
                 if not self.ensure_engine_started():
                     return
+            elif self.engine:
+                self.engine.stop()
+                self.engine_running = False
             self.listening = value
             self.status = "Слушаю" if value else "Пауза"
             self.status_kind = "listening" if value else "paused"
+            if not value:
+                self.partial_text = ""
+                self.mic_level = 0.0
 
     def _on_partial(self, text: str) -> None:
         with self.lock:
@@ -604,7 +620,7 @@ class AppController:
         except Exception as exc:
             return {"ok": False, "message": str(exc)}
 
-    def get_status(self) -> dict:
+    def get_status(self, include_log: bool = False) -> dict:
         with self.lock:
             return {
                 "app_name": self.config.get("app_name"),
@@ -640,7 +656,7 @@ class AppController:
                 "github_repo": self.config.get("github_repo"),
                 "release_asset_name": self.config.get("release_asset_name"),
                 "log_file": str(log_file_path()),
-                "log_tail": self.read_log_tail(),
+                "log_tail": self.read_log_tail() if include_log else "",
             }
 
     def get_recent_phrases(self) -> list[dict]:
@@ -703,8 +719,8 @@ class AppApi:
     def set_input_method(self, method):
         return self.controller.set_input_method(method)
 
-    def get_status(self):
-        return self.controller.get_status()
+    def get_status(self, include_log=False):
+        return self.controller.get_status(bool(include_log))
 
     def get_recent_phrases(self):
         return self.controller.get_recent_phrases()

@@ -866,9 +866,19 @@
       transform: translateY(0) scale(.98);
     }
 
+    .mic-button:disabled {
+      cursor: wait;
+      opacity: .74;
+      transform: none;
+    }
+
     .mic-button .mic-icon {
       font-size: 62px;
       filter: drop-shadow(0 8px 10px rgba(0,0,0,.13));
+    }
+
+    .mic-button.busy .mic-icon {
+      animation: micBusy 1s var(--ease) infinite;
     }
 
     .mic-button.listening {
@@ -896,6 +906,11 @@
     @keyframes pulse {
       0% { transform: scale(.9); opacity: .85; }
       100% { transform: scale(1.25); opacity: 0; }
+    }
+
+    @keyframes micBusy {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(.9); }
     }
 
     .history-grid {

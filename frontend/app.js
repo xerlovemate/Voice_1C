@@ -13,9 +13,12 @@ let backendReady = false;
 let backendInitialized = false;
 let backendProbeTimer = null;
 let statusPollTimer = null;
+let logPollTimer = null;
 let pendingUpdate = false;
 let levelHistory = new Array(12).fill(0);
 let lastListeningState = null;
+let lastHistorySignature = "";
+let micTogglePending = false;
 let splashStartedAt = Date.now();
 let splashTimer = null;
 
@@ -219,13 +222,20 @@ function setListeningVisual(state) {
 
 function renderHistory(items) {
   const list = $("#historyList");
+  const visibleItems = (items || []).slice(0, 6);
+  const signature = JSON.stringify(
+    visibleItems.map((item) => [item.kind, item.time, item.result || item.phrase || ""])
+  );
+  if (signature === lastHistorySignature) return;
+  lastHistorySignature = signature;
+
   list.innerHTML = "";
-  if (!items || items.length === 0) {
+  if (visibleItems.length === 0) {
     list.innerHTML = `<div class="history-item"><strong><span>Система</span><span>сейчас</span></strong><p>Ожидание диктовки...</p></div>`;
     return;
   }
 
-  items.slice(0, 6).forEach((item) => {
+  visibleItems.forEach((item) => {
     const div = document.createElement("div");
     div.className = "history-item";
     div.innerHTML = `<strong><span>${escapeHtml(item.kind)}</span><span>${escapeHtml(item.time)}</span></strong><p>${escapeHtml(item.result || item.phrase)}</p>`;
@@ -381,17 +391,34 @@ function renderStatus(state) {
   $("#updateLog").textContent = `[repo] ${state.github_owner}/${state.github_repo}
 [asset] ${state.release_asset_name}
 [status] ${state.update_message || "Готово"}`;
-  $("#appLog").textContent = state.log_tail || `[status] ${state.status}
+  const appLog = $("#appLog");
+  if (state.log_tail) {
+    appLog.textContent = state.log_tail;
+    appLog.dataset.initialized = "true";
+  } else if (!appLog.dataset.initialized) {
+    appLog.textContent = `[status] ${state.status}
 [mode] ${state.mode}
 [engine] ${state.speech_engine}
 [input] ${state.input_method}
 [log] ${state.log_file}`;
+    appLog.dataset.initialized = "true";
+  }
 }
 
 async function pollStatus() {
   if (!backendReady || !api()) return;
   try {
     renderStatus(await api().get_status());
+  } catch (error) {
+    console.warn(error);
+  }
+}
+
+async function refreshLogTail() {
+  if (!backendReady || !api()?.read_log_tail) return;
+  try {
+    const logTail = await api().read_log_tail();
+    if (logTail) $("#appLog").textContent = logTail;
   } catch (error) {
     console.warn(error);
   }
@@ -426,7 +453,11 @@ async function initializeBackend(source = "event") {
   });
 
   if (!statusPollTimer) {
-    statusPollTimer = setInterval(pollStatus, 250);
+    statusPollTimer = setInterval(pollStatus, 500);
+  }
+  if (!logPollTimer) {
+    refreshLogTail();
+    logPollTimer = setInterval(refreshLogTail, 3000);
   }
 }
 
@@ -536,9 +567,25 @@ function bindUi() {
   });
 
   $("#micButton").addEventListener("click", async () => {
-    await logUi("toggle_listening called");
-    const result = await callBackend("toggle_listening");
-    if (result) showToast(result.listening ? "Диктовка включена" : "Диктовка остановлена");
+    if (micTogglePending) {
+      showToast("Подождите, переключаю диктовку...");
+      return;
+    }
+    const micButton = $("#micButton");
+    micTogglePending = true;
+    micButton.disabled = true;
+    micButton.classList.add("busy");
+    try {
+      await logUi("toggle_listening called");
+      const result = await callBackend("toggle_listening");
+      if (result) showToast(result.listening ? "Диктовка включена" : "Диктовка остановлена");
+    } finally {
+      setTimeout(() => {
+        micTogglePending = false;
+        micButton.disabled = false;
+        micButton.classList.remove("busy");
+      }, 900);
+    }
   });
 
   $("#formatTest").addEventListener("click", async () => {

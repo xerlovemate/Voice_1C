@@ -230,7 +230,7 @@ class ChromeSpeechEngine(SpeechEngineBase):
                 self.logger.info("[CHROME] bridge state: %s", status)
 
     def get_status(self) -> dict:
-        chrome = self.manager.status()
+        chrome = self.manager.status(include_version=self.state not in {"starting", "listening"})
         return {
             "available": self.is_available(),
             "state": self.state,

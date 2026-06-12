@@ -93,12 +93,12 @@ class ChromeManager:
         except Exception:
             return ""
 
-    def status(self) -> dict:
+    def status(self, include_version: bool = True) -> dict:
         path = self.find_chrome()
         return {
             "found": bool(path),
             "path": str(path) if path else "",
-            "version": self.chrome_version() if path else "",
+            "version": self.chrome_version() if path and include_version else (self._cached_version or ""),
             "profile_path": str(chrome_profile_dir()),
             "download_url": CHROME_DOWNLOAD_URL,
         }
