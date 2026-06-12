@@ -10,6 +10,9 @@ const pageMeta = {
 };
 
 let backendReady = false;
+let backendInitialized = false;
+let backendProbeTimer = null;
+let statusPollTimer = null;
 let pendingUpdate = false;
 let levelHistory = new Array(12).fill(0);
 let lastListeningState = null;
@@ -394,6 +397,51 @@ async function pollStatus() {
   }
 }
 
+async function initializeBackend(source = "event") {
+  if (backendInitialized || !api()) return;
+  backendInitialized = true;
+  backendReady = true;
+  if (backendProbeTimer) {
+    clearInterval(backendProbeTimer);
+    backendProbeTimer = null;
+  }
+
+  hideSplash();
+  showToast("Backend подключён");
+  try {
+    await api().log_event?.(`[UI] backend initialized via ${source}`);
+  } catch (error) {
+    console.warn(error);
+  }
+
+  try {
+    renderStatus(await api().get_status());
+  } catch (error) {
+    console.warn(error);
+  }
+
+  refreshMicrophones().catch((error) => {
+    console.warn(error);
+    showToast("Не удалось загрузить микрофоны");
+  });
+
+  if (!statusPollTimer) {
+    statusPollTimer = setInterval(pollStatus, 250);
+  }
+}
+
+function startBackendProbe() {
+  if (backendProbeTimer) clearInterval(backendProbeTimer);
+  backendProbeTimer = setInterval(() => {
+    if (api()) {
+      initializeBackend("poll");
+    }
+  }, 250);
+  if (api()) {
+    initializeBackend("immediate");
+  }
+}
+
 function bindUi() {
   $$(".nav button").forEach((btn) => btn.addEventListener("click", () => setView(btn.dataset.view)));
 
@@ -559,13 +607,8 @@ function bindUi() {
   });
 }
 
-document.addEventListener("pywebviewready", async () => {
-  backendReady = true;
-  showToast("Backend подключён");
-  await refreshMicrophones();
-  await pollStatus();
-  hideSplash();
-  setInterval(pollStatus, 250);
+document.addEventListener("pywebviewready", () => {
+  initializeBackend("pywebviewready");
 });
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -573,6 +616,7 @@ window.addEventListener("DOMContentLoaded", () => {
   bindUi();
   setListeningVisual({ listening: false, status_kind: "paused" });
   updateMicLevel(0);
+  startBackendProbe();
   setTimeout(() => {
     if (!backendReady) showToast("Ожидание backend...");
   }, 900);

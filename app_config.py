@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 DEFAULT_CONFIG = {
     "app_name": "Voice 1C",
